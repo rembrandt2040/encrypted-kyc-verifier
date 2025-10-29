@@ -1,0 +1,13 @@
+[package]
+name = "tfhe-wasm-wrapper"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+tfhe = { path = "../tfhe-rs/tfhe", default-features = false, features = ["shortint"] }
+wasm-bindgen = "0.2"
+getrandom = { version = "0.2", features = ["js"] }
+bincode = "1.3"
