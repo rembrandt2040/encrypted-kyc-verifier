@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: encrypted-kyc-verifier-backend
+    env: node
+    rootDir: verifier
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "node index.js"
+    envVars:
+      - key: VERIFIER_PRIV_KEY
+        sync: false
+      - key: POLICY_ID
+        sync: false
+      - key: COUNTRY_CODE_ALLOWED
+        sync: false

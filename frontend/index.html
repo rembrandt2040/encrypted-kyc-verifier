@@ -1,68 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Zama KYC Verifier DApp</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Encrypted KYC Verifier DApp</title>
+  <script type="module" src="app.js"></script>
   <style>
     body {
-      font-family: system-ui, sans-serif;
-      background: #f8f9fb;
-      padding: 20px;
-      max-width: 550px;
-      margin: auto;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f9fafb;
+      text-align: center;
+      padding: 40px;
     }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
+    h1 {
+      color: #1e40af;
     }
     input {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
+      margin: 8px;
       padding: 8px;
+      width: 220px;
+      font-size: 16px;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
-    #result, #decryptedOutput, #cipherPreview {
-      margin-top: 15px;
-      font-size: 1em;
-      font-weight: bold;
-      word-wrap: break-word;
-    }
-    #cipherPreview {
-      font-family: monospace;
-      background: #f1f1f1;
-      padding: 10px;
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
       border-radius: 6px;
+      padding: 10px 16px;
+      margin: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #1e3a8a;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.1em;
     }
   </style>
 </head>
 <body>
-  <h2>🔐 Encrypted KYC Verifier</h2>
-  <p id="status">Loading TFHE...</p>
-  <p id="verifierStatus">Checking verifier...</p>
-  
-  <button id="connectWallet">Connect Wallet</button>
-  <p id="walletStatus"></p>
+  <h1>🔐 Encrypted KYC Verifier</h1>
+  <p>Privacy-preserving age and country verification using Zama FHE</p>
 
-  <input id="ageInput" placeholder="Enter your age" type="number" />
-  <input id="countryInput" placeholder="Enter country code (e.g., 826)" type="number" />
+  <div>
+    <input type="number" id="age" placeholder="Enter your age" /><br />
+    <input type="number" id="country" placeholder="Enter country code (e.g., 826)" /><br />
+    <button id="connectBtn">🔗 Connect Wallet</button>
+    <button id="encryptBtn">🧠 Encrypt + Verify</button>
+  </div>
 
-  <button id="encryptVerifyBtn">Encrypt + Verify</button>
-
-  <p id="cipherPreview"></p>
-  <p id="decryptedOutput"></p>
-  <p id="result"></p>
-
-  <script type="module" src="app.js"></script>
+  <div id="status">Status: Waiting for input...</div>
 </body>
 </html>
