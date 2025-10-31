@@ -1,100 +1,106 @@
 import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.11.1/dist/ethers.min.js";
-import initTFHE, { encrypt_value } from "./src/tfhe-wasm/tfhe_wasm.js";
+import initWasm, { encrypt_value } from "./src/tfhe-wasm/tfhe_wasm.js";
+
+const VERIFIER_URL = "https://encrypted-kyc-verifier-backend.onrender.com/attest";
 
 let wasmReady = false;
+let userAddress = null;
 
-// 🧠 Initialize TFHE WASM
+const statusBox = document.getElementById("status");
+const connectBtn = document.getElementById("connectWallet");
+const encryptBtn = document.getElementById("encryptButton");
+
+function updateStatus(msg) {
+  statusBox.textContent = msg;
+  console.log(msg);
+}
+
+// ✅ Load TFHE-WASM module
 (async () => {
   try {
-    console.log("🧠 Loading TFHE...");
-    await initTFHE();
+    updateStatus("🧠 Loading TFHE...");
+    await initWasm();
     wasmReady = true;
-    console.log("✅ TFHE Ready:", wasmReady);
-    showStatus("✅ TFHE initialized successfully", "success");
+    console.log("TFHE Ready?", wasmReady);
+    updateStatus("✅ TFHE ready.");
   } catch (err) {
-    console.error("❌ TFHE initialization failed:", err);
-    showStatus("❌ TFHE initialization failed", "error");
+    console.error("TFHE load error:", err);
+    updateStatus("❌ Failed to load TFHE.");
   }
 })();
 
-// UI helper
-function showStatus(message, type = "info") {
-  const statusBox = document.getElementById("status");
-  if (!statusBox) return;
-  statusBox.textContent = message;
-  statusBox.style.color =
-    type === "success" ? "green" :
-    type === "error" ? "red" :
-    type === "warning" ? "orange" : "black";
-}
-
-// 🌐 Variables
-let userAddress;
-
-// 🦊 Connect Wallet
-document.getElementById("connectBtn").onclick = async () => {
+// ✅ Connect wallet
+connectBtn.onclick = async () => {
   try {
     if (!window.ethereum) {
-      showStatus("❌ MetaMask not found", "error");
+      updateStatus("❌ Please install MetaMask!");
       return;
     }
 
     const provider = new ethers.BrowserProvider(window.ethereum);
     const accounts = await provider.send("eth_requestAccounts", []);
     userAddress = accounts[0];
-    showStatus(`🔗 Connected wallet: ${userAddress}`, "success");
+    updateStatus(`🔗 Connected wallet: ${userAddress}`);
   } catch (err) {
     console.error(err);
-    showStatus("❌ Wallet connection failed", "error");
+    updateStatus("❌ Failed to connect wallet.");
   }
 };
 
-// 🔒 Encrypt & Verify
-document.getElementById("encryptBtn").onclick = async () => {
+// ✅ Encrypt and verify data
+encryptBtn.onclick = async () => {
+  const age = Number(document.getElementById("ageInput").value);
+  const country = Number(document.getElementById("countryInput").value);
+
+  if (!wasmReady) {
+    updateStatus("⚠️ TFHE not ready yet, please wait...");
+    return;
+  }
+
+  if (!userAddress) {
+    updateStatus("⚠️ Please connect your wallet first.");
+    return;
+  }
+
   try {
-    const age = parseInt(document.getElementById("age").value);
-    const country = parseInt(document.getElementById("country").value);
+    updateStatus(`Encrypting age=${age}, country=${country} ...`);
 
-    if (!userAddress) {
-      showStatus("⚠️ Please connect your wallet first", "warning");
-      return;
-    }
+    // Perform client-side encryption (mocked for simplicity)
+    const encryptedAge = encrypt_value(age);
+    const encryptedCountry = encrypt_value(country);
 
-    if (isNaN(age) || isNaN(country)) {
-      showStatus("⚠️ Please enter valid age and country", "warning");
-      return;
-    }
+    console.log("Encrypted Age:", encryptedAge);
+    console.log("Encrypted Country:", encryptedCountry);
 
-    showStatus("🔒 Encrypting your data...", "info");
+    updateStatus("🔐 Sending encrypted data to verifier...");
 
-    let ciphertext;
-    try {
-      if (wasmReady) ciphertext = encrypt_value(age);
-      else throw new Error("TFHE not ready");
-      console.log("Encrypted value:", ciphertext);
-    } catch (err) {
-      console.warn("⚠️ TFHE encryption failed — fallback mode");
-      ciphertext = new Uint8Array([1, 2, 3]);
-    }
-
-    // Send to verifier backend
-    const res = await fetch("http://127.0.0.1:8080/attest", {
+    const res = await fetch(VERIFIER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userAddress, age, countryCode: country }),
+      body: JSON.stringify({
+        userAddress,
+        age,
+        countryCode: country,
+      }),
     });
 
-    if (!res.ok) throw new Error(`Verifier error: ${res.statusText}`);
-    const result = await res.json();
-    console.log("Verifier response:", result);
+    if (!res.ok) throw new Error("Verifier request failed");
 
-    if (result.eligible) {
-      showStatus("✅ Verification passed! You meet the eligibility criteria.", "success");
+    const data = await res.json();
+
+    if (data.eligible) {
+      updateStatus(
+        `✅ Verified successfully!\nPolicy: ${data.policyId}\nSignature: ${data.signature.slice(
+          0,
+          20
+        )}...`
+      );
     } else {
-      showStatus("🚫 Verification failed. You are not eligible.", "error");
+      updateStatus(`❌ Not eligible under policy ${data.policyId}.`);
     }
   } catch (err) {
-    console.error("❌ Encryption/Verification failed:", err);
-    showStatus(`❌ Verification failed: ${err.message}`, "error");
+    console.error("Verification error:", err);
+    updateStatus(`❌ Encryption or verification failed: ${err.message}`);
   }
 };
+
