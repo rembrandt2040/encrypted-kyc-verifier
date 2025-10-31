@@ -8,7 +8,13 @@ dotenv.config();
 
 // ✅ Initialize Express app
 const app = express();
-app.use(cors()); // Allow requests from frontend (localhost:3000)
+
+// Allow frontend origin (both localhost and Vercel)
+app.use(cors({
+  origin: ["http://localhost:3000", "https://your-vercel-frontend.vercel.app"],
+  methods: ["POST"],
+  allowedHeaders: ["Content-Type"],
+}));
 app.use(express.json());
 
 // ✅ Initialize verifier wallet from .env
@@ -57,8 +63,9 @@ app.post("/attest", async (req, res) => {
   }
 });
 
-// ✅ Start server
-const PORT = 8080;
-app.listen(PORT, () => {
-  console.log(`🚀 Verifier service live at http://127.0.0.1:${PORT}`);
+// ✅ Use Render-assigned port instead of hardcoding 8080
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Verifier service live on port ${PORT}`);
 });
