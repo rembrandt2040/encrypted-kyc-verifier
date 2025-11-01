@@ -1,9 +1,0 @@
-{
-  "builds": [
-    {
-      "src": "frontend/public/**/*",
-      "use": "@vercel/static"
-    }
-  ],
-  "output": "frontend/public"
-}

@@ -1,5 +1,11 @@
 {
-  "devDependencies": {
-    "hardhat": "^3.0.9"
+  "name": "encrypted-kyc-verifier",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cp -r frontend/node_modules/@zama.ai/tfhe-wasm/dist/tfhe-wasm/* frontend/public/tfhe-wasm/ || true"
+  },
+  "dependencies": {
+    "@zama.ai/tfhe-wasm": "^1.0.0"
   }
 }

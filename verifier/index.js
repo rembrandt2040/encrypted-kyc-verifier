@@ -11,7 +11,7 @@ const app = express();
 
 // Allow frontend origin (both localhost and Vercel)
 app.use(cors({
-  origin: ["http://localhost:3000", "https://your-vercel-frontend.vercel.app"],
+  origin: ["http://localhost:3000", "https://encrypted-kyc-verifier.vercel.app"],
   methods: ["POST"],
   allowedHeaders: ["Content-Type"],
 }));

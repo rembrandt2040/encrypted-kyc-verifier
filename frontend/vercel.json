@@ -1,16 +1,13 @@
 {
   "version": 2,
-  "public": true,
   "builds": [
     { "src": "index.html", "use": "@vercel/static" },
-    { "src": "src/tfhe-wasm/*.wasm", "use": "@vercel/static" }
-  ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "src": "app.js", "use": "@vercel/static" },
+    { "src": "tfhe-wasm/*.wasm", "use": "@vercel/static" }
   ],
   "headers": [
     {
-      "source": "/src/tfhe-wasm/(.*).wasm",
+      "source": "/tfhe-wasm/(.*).wasm",
       "headers": [
         { "key": "Content-Type", "value": "application/wasm" },
         { "key": "Access-Control-Allow-Origin", "value": "*" }

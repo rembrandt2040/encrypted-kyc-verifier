@@ -73,6 +73,13 @@
       <div id="status" class="status">Status: Waiting for action...</div>
     </div>
 
-    <script type="module" src="./app.js"></script>
-  </body>
+    <!-- Load ethers (CDN) -->
+  <script type="module">
+    import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.11.1/dist/ethers.min.js";
+    window.ethers = ethers;
+  </script>
+
+  <!-- Your app logic -->
+  <script type="module" src="./app.js"></script>
+</body>
 </html>
